@@ -81,10 +81,7 @@ void setup() {
 }
 
 uint8_t readCols(){
-  digitalWrite(RA0_PIN, LOW);
-  digitalWrite(RA1_PIN, LOW);
-  digitalWrite(RA2_PIN, LOW);
-  digitalWrite(REN_PIN, HIGH);
+
 
   uint8_t x = digitalRead(C0_PIN);
   uint8_t C1 = digitalRead(C1_PIN);
@@ -98,7 +95,36 @@ uint8_t readCols(){
   return x;
 }
 
-void setRow(unit8_t,rowIdx)
+void setRow(unit8_t rowIdx){
+  digitalWrite(REN_PIN, LOW);
+  digitalWrite(RA0_PIN, LOW);
+  digitalWrite(RA1_PIN, LOW);
+  digitalWrite(RA2_PIN, LOW);
+
+  uint8_t bit1 = rowIdx & 1;
+  uint8_t bit2 = rowIdx & 2;
+  uint8_t bit3 = rowIdx & 4;
+
+  if (bit1 ==1){
+    digitalWrite(RA0_PIN, HIGH);
+  }
+  if (bit2 ==2){
+    digitalWrite(RA1_PIN, HIGH);
+  }
+  if (bit3 ==4){
+    digitalWrite(RA2_PIN, HIGH);
+  }
+
+
+  
+  
+  
+
+  
+  digitalWrite(REN_PIN, HIGH);
+  
+
+}
 
 void loop() {
   // put your main code here, to run repeatedly:
