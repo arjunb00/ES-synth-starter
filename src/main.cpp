@@ -95,7 +95,7 @@ uint8_t readCols(){
   return x;
 }
 
-void setRow(unit8_t rowIdx){
+void setRow(uint8_t rowIdx){
   digitalWrite(REN_PIN, LOW);
   digitalWrite(RA0_PIN, LOW);
   digitalWrite(RA1_PIN, LOW);
@@ -104,22 +104,17 @@ void setRow(unit8_t rowIdx){
   uint8_t bit1 = rowIdx & 1;
   uint8_t bit2 = rowIdx & 2;
   uint8_t bit3 = rowIdx & 4;
+  Serial.write(bit1);
 
-  if (bit1 ==1){
+  if (bit1 == 1){
     digitalWrite(RA0_PIN, HIGH);
   }
-  if (bit2 ==2){
+  if (bit2 == 2){
     digitalWrite(RA1_PIN, HIGH);
-  }
-  if (bit3 ==4){
+  }   
+  if (bit3 == 4){
     digitalWrite(RA2_PIN, HIGH);
   }
-
-
-  
-  
-  
-
   
   digitalWrite(REN_PIN, HIGH);
   
@@ -128,15 +123,28 @@ void setRow(unit8_t rowIdx){
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+  uint8_t keyArray[7];
   static uint32_t next = millis();
   static uint32_t count = 0;
   u8g2.clearBuffer();         // clear the internal memory
   u8g2.setFont(u8g2_font_ncenB08_tr); // choose a suitable font
-  u8g2.drawStr(2,10,"Hello World!");  // write something to the internal memory
-  uint8_t keys = readCols();
+  
+
+  for (int i = 0; i < 3; i++) {
+    setRow(i);
+    delayMicroseconds(3);
+    uint8_t keys = readCols();
+    keyArray[i] == keys;
+  }
+
+
+  u8g2.setCursor(2,10);
+  u8g2.print(keyArray[0],HEX);
   u8g2.setCursor(2,20);
-  u8g2.print(keys,HEX);
+  u8g2.print(keyArray[1],HEX);
   u8g2.setCursor(2,30);
+  u8g2.print(keyArray[2],HEX);
  
   u8g2.sendBuffer();      
 
