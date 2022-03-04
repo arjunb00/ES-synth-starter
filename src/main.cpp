@@ -96,28 +96,26 @@ uint8_t readCols(){
 }
 
 void setRow(uint8_t rowIdx){
+
   digitalWrite(REN_PIN, LOW);
-  digitalWrite(RA0_PIN, LOW);
-  digitalWrite(RA1_PIN, LOW);
-  digitalWrite(RA2_PIN, LOW);
 
-  uint8_t bit1 = rowIdx & 1;
-  uint8_t bit2 = rowIdx & 2;
-  uint8_t bit3 = rowIdx & 4;
-  Serial.write(bit1);
-
-  if (bit1 == 1){
+  if ((rowIdx) == 2) {
+    digitalWrite(RA2_PIN, LOW);
+    digitalWrite(RA1_PIN, HIGH);
+    digitalWrite(RA0_PIN, LOW);
+  }
+  if ((rowIdx) == 1) {
+    digitalWrite(RA2_PIN, LOW);
+    digitalWrite(RA1_PIN, LOW);
     digitalWrite(RA0_PIN, HIGH);
   }
-  if (bit2 == 2){
-    digitalWrite(RA1_PIN, HIGH);
-  }   
-  if (bit3 == 4){
-    digitalWrite(RA2_PIN, HIGH);
+  if ((rowIdx) == 0) {
+    digitalWrite(RA2_PIN, LOW);
+    digitalWrite(RA1_PIN, LOW);
+    digitalWrite(RA0_PIN, LOW);
   }
-  
+
   digitalWrite(REN_PIN, HIGH);
-  
 
 }
 
