@@ -35,9 +35,14 @@
   const int HKOE_BIT = 6;
 
   volatile uint8_t keyArray[7];
+  SemaphoreHandle_t keyArrayMutex;
+
   volatile uint8_t key_pressed_step_size = 12;
+
   const int32_t stepSizes [] = {51076056, 54113197, 57330935, 60740010, 64351798, 68178356, 72232452, 76527617, 81078186, 85899345, 91007186, 96418755};
+
   const char* notes[13] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", " "};
+
   volatile int32_t currentStepSize;
 
 //Display driver object
@@ -110,6 +115,8 @@ void scanKeysTask(void * pvParameters) {
   while(1){
     vTaskDelayUntil( &xLastWakeTime, xFrequency );
     uint8_t key_Pressed = 0;
+    xSemaphoreTake(keyArrayMutex, portMAX_DELAY);
+    
 
     for(uint8_t i = 0; i < 3; i++){
       setRow(i);
@@ -179,6 +186,7 @@ void scanKeysTask(void * pvParameters) {
       default:
         break;    
     }
+    xSemaphoreGive(keyArrayMutex);
     
     if(key_Pressed == 0){
       key_pressed_step_size = 12;
@@ -187,6 +195,7 @@ void scanKeysTask(void * pvParameters) {
     else{
       __atomic_store_n(&currentStepSize, stepSizes[key_pressed_step_size], __ATOMIC_RELAXED);
     }
+    
   }
 }
 
@@ -196,16 +205,20 @@ void displayUpdateTask(void * pvParameters){
   TickType_t xLastWakeTime = xTaskGetTickCount(); 
 
   while(1){
+    
     u8g2.clearBuffer();         // clear the internal memory
     u8g2.setFont(u8g2_font_ncenB08_tr); // choose a suitable font u8g2_font_ncenB08_tr
     u8g2.drawStr(2,10,"hello world");  // write something to the internal memory
     u8g2.setCursor(2,20);
+    xSemaphoreTake(keyArrayMutex, portMAX_DELAY);
     u8g2.print(keyArray[0],HEX);
     u8g2.print(keyArray[1],HEX);
     u8g2.print(keyArray[2],HEX);
+    xSemaphoreGive(keyArrayMutex);
     u8g2.setCursor(2,30);
     u8g2.print(notes[key_pressed_step_size]);
     u8g2.sendBuffer();
+    
   }
 }
 
@@ -265,6 +278,8 @@ void setup() {
   //Initialise UART
   Serial.begin(9600);
   Serial.println("Hello World");
+
+  keyArrayMutex = xSemaphoreCreateMutex();
 
   vTaskStartScheduler();
 }
